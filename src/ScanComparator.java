@@ -1,4 +1,8 @@
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.math.BigInteger;
+import java.util.ArrayList;
 
 /**
  * Created by cjhsu on 3/8/17.
@@ -9,86 +13,123 @@ public class ScanComparator {
     private BufferedImage phonopostImg2;
     private int centerX1;
     private int centerY1;
-    private int centerX2;
-    private int centerY2;
-    private List<CompWindow> windows;
-    private final int comparisonRadius = 10;
+    private double rotationStart;
+    private double rotationEnd;
+    private double rotationPrecision;
+
+    private BigInteger sumDistSquared = null;
+
+    //windows are from the center
+    private ArrayList<CompWindow> windows;
+    private final int comparisonRadius = 50;
     private final double scale = 255 * 255;
 
-    public ScanComparator (BufferedImage img1, BufferedImage img2, List<CompWindow> windows) {
+    public ScanComparator (BufferedImage img1, BufferedImage img2, double rotationStart, double rotationEnd, double rotationPrecision, ArrayList<CompWindow> windows) {
         this.phonopostImg1 = img1;
         this.phonopostImg2 = img2;
         this.centerX1 = img1.getWidth()/2;
         this.centerY1 = img1.getHeight()/2;
-        this.centerX2 = img2.getWidth()/2;
-        this.centerY2 = img2.getHeight()/2;
+        this.rotationStart = rotationStart;
+        this.rotationEnd = rotationEnd;
+        this.rotationPrecision = rotationPrecision;
         this.windows = windows;
     }
 
-    // positive radians for counterclockwise rotation
-    private double rotationSample (double radians, double x, double y) {
-
-    }
-
-    public double[] minDistance() {
+    public double[] calculateMinDistance() {
         double minDistanceSquared = Double.MAX_VALUE;
+        BigInteger sumMinDistanceSquared = null;
 
-//        double minR = Double.MAX_VALUE;
-//        double minG = Double.MAX_VALUE;
-//        double minB = Double.MAX_VALUE;
+        boolean nullSum = true;
 
-        double[] minCoordinates = new double[6];
+        // 0 is x offset, 1 is y offset, 2 is theta of rotation, 3 is numPixels
+        double[] minCoordinates = new double[4];
 
-        for (int xTranslate = -comparisonRadius; xTranslate <= comparisonRadius; xTranslate++) {
-            for (int yTranslate = -comparisonRadius; yTranslate <= comparisonRadius; yTranslate++) {
-                double distSum = 0;
-                double rDiffSum = 0;
-//                double gDiffSum = 0;
-//                double bDiffSum = 0;
-                int numPixels = 0;
-                for (int x = 60; x < phonopostImg1.getWidth() - 60; x++) {
-                    for (int y = 60; y < phonopostImg1.getHeight() - 4000; y++) {
-                        if ((x + xTranslate) <= 0 || (x + xTranslate) >= phonopostImg2.getWidth() || (y +  yTranslate) <= 0 || (y + yTranslate) >= phonopostImg2.getHeight()) {
-                            continue;
+        // rotate
+        for (double theta = rotationStart; theta <= rotationEnd; theta += rotationPrecision) {
+            AffineTransform rotation = new AffineTransform();
+            rotation.rotate(theta, phonopostImg2.getWidth()/2, phonopostImg2.getHeight()/2);
+            AffineTransformOp rotateOp = new AffineTransformOp(rotation, AffineTransformOp.TYPE_BILINEAR);
+            BufferedImage rotatedPhonopostImg2 = rotateOp.filter(phonopostImg2, null);
+
+            int centerX2 = rotatedPhonopostImg2.getWidth()/2;
+            int centerY2 = rotatedPhonopostImg2.getHeight()/2;
+
+
+            //System.out.println("theta: " + theta);
+
+
+
+            for (int xTranslate = -comparisonRadius; xTranslate <= comparisonRadius; xTranslate++) {
+                breakloop:
+                for (int yTranslate = -comparisonRadius; yTranslate <= comparisonRadius; yTranslate++) {
+                    BigInteger bDiffSqSum = BigInteger.ZERO;
+                    int numPixels = 0;
+
+                    // for each window
+                    for (int winNum = 0; winNum < windows.size(); winNum++) {
+
+                        CompWindow currWindow = windows.get(winNum);
+
+                        for (int x = currWindow.getX(); x < currWindow.getX() + currWindow.getWidth(); x++) {
+                            for (int y = currWindow.getY(); y < currWindow.getY() + currWindow.getHeight(); y++) {
+                                if ((x + xTranslate) <= 0 || (x + xTranslate) >= phonopostImg2.getWidth() || (y +  yTranslate) <= 0 || (y + yTranslate) >= phonopostImg2.getHeight()) {
+                                    System.out.println("out of comp bounds");
+                                }
+
+                                int rgb1 = phonopostImg1.getRGB(x, y);
+                                int xFromCenter = (x - centerX1) + centerX2;
+                                int yFromCenter = (y - centerY1) + centerY2;
+                                //System.out.println("X offset: " + (x-centerX1));
+                                //System.out.println("Ys: " + y + " " + yFromCenter);
+
+                                int rgb2 = rotatedPhonopostImg2.getRGB(xFromCenter + xTranslate, yFromCenter + yTranslate);
+
+                                int bDiff = ((rgb1) & 0xFF) - ((rgb2) & 0xFF);
+                                int bDiffSq = bDiff * bDiff;
+
+                                bDiffSqSum = bDiffSqSum.add(BigInteger.valueOf(bDiffSq));
+
+                                numPixels++;
+
+                                if (!nullSum) {
+                                    // if the sum already exceeds a found min, forget this iteration
+                                    if (bDiffSqSum.compareTo(sumMinDistanceSquared) > 0) {
+                                        break breakloop;
+                                    }
+                                }
+                            }
                         }
-                        numPixels++;
-                        int rgb1 = phonopostImg1.getRGB(x, y);
-                        int rgb2 = phonopostImg2.getRGB(x + xTranslate, y + yTranslate);
+                    }
 
-                        int rDiff = ((rgb1 >> 16) & 0xFF) - ((rgb2 >> 16) & 0xFF);
 
-//                        int gDiff = ((rgb1 >> 8) & 0xFF) - ((rgb2 >> 8) & 0xFF);
-//                        int bDiff = ((rgb1) & 0xFF) - ((rgb2) & 0xFF);
-
-                        // Scaled 0-1
-                        double rDiffSq = (rDiff * rDiff);
-//                        double gDiffSq = (gDiff * gDiff);
-//                        double bDiffSq = (bDiff * bDiff);
-
-                        distSum += rDiffSq;
-                        rDiffSum += rDiffSq;
-//                        gDiffSum += gDiffSq;
-//                        bDiffSum += bDiffSq;
+                    if (nullSum) {
+                        sumMinDistanceSquared = bDiffSqSum;
+                        minCoordinates[0] = xTranslate;
+                        minCoordinates[1] = yTranslate;
+                        minCoordinates[2] = theta;
+                        minCoordinates[3] = numPixels;
+                        nullSum = false;
+                    }
+                    else if (bDiffSqSum.compareTo(sumMinDistanceSquared) < 0) {
+                        sumMinDistanceSquared = bDiffSqSum;
+                        minCoordinates[0] = xTranslate;
+                        minCoordinates[1] = yTranslate;
+                        minCoordinates[2] = theta;
+                        minCoordinates[3] = numPixels;
                     }
                 }
-
-                if ((distSum / numPixels) < minDistanceSquared) {
-                    minDistanceSquared = distSum / numPixels;
-
-//                    minR = rDiffSum / numPixels;
-//                    minG = gDiffSum / numPixels;
-//                    minB = bDiffSum / numPixels;
-
-                    minCoordinates[0] = xTranslate;
-                    minCoordinates[1] = yTranslate;
-                    minCoordinates[2] = minDistanceSquared;
-//                    minCoordinates[3] = minR;
-//                    minCoordinates[4] = minG;
-//                    minCoordinates[5] = minB;
-                }
             }
+
         }
 
+
+
+        this.sumDistSquared = sumMinDistanceSquared;
+
         return minCoordinates;
+    }
+
+    public BigInteger getSumDistSquared() {
+        return this.sumDistSquared;
     }
 }
