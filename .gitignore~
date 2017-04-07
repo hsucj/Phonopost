@@ -3,3 +3,4 @@ Phonopost.iml
 scan[0-9]/
 .idea/
 **/.DS_Store
+*.png
