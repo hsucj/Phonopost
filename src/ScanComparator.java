@@ -16,15 +16,19 @@ public class ScanComparator {
     private double rotationStart;
     private double rotationEnd;
     private double rotationPrecision;
+    private int xStart;
+    private int xEnd;
+    private int yStart;
+    private int yEnd;
 
     private BigInteger sumDistSquared = null;
 
     //windows are from the center
     private ArrayList<CompWindow> windows;
-    private final int comparisonRadius = 50;
     private final double scale = 255 * 255;
 
-    public ScanComparator (BufferedImage img1, BufferedImage img2, double rotationStart, double rotationEnd, double rotationPrecision, ArrayList<CompWindow> windows) {
+    public ScanComparator (BufferedImage img1, BufferedImage img2, double rotationStart, double rotationEnd,
+                           double rotationPrecision, int xStart, int xEnd, int yStart, int yEnd, ArrayList<CompWindow> windows) {
         this.phonopostImg1 = img1;
         this.phonopostImg2 = img2;
         this.centerX1 = img1.getWidth()/2;
@@ -32,6 +36,10 @@ public class ScanComparator {
         this.rotationStart = rotationStart;
         this.rotationEnd = rotationEnd;
         this.rotationPrecision = rotationPrecision;
+        this.xStart = xStart;
+        this.xEnd = xEnd;
+        this.yStart = yStart;
+        this.yEnd = yEnd;
         this.windows = windows;
     }
 
@@ -59,9 +67,9 @@ public class ScanComparator {
 
 
 
-            for (int xTranslate = -comparisonRadius; xTranslate <= comparisonRadius; xTranslate++) {
+            for (int xTranslate = xStart; xTranslate <= xEnd; xTranslate++) {
                 breakloop:
-                for (int yTranslate = -comparisonRadius; yTranslate <= comparisonRadius; yTranslate++) {
+                for (int yTranslate = yStart; yTranslate <= yEnd; yTranslate++) {
                     BigInteger bDiffSqSum = BigInteger.ZERO;
                     int numPixels = 0;
 

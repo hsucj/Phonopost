@@ -18,6 +18,10 @@ public class Driver {
         double rotationStart;
         double rotationEnd;
         double rotationPrecision;
+        int xStart;
+        int xEnd;
+        int yStart;
+        int yEnd;
 
         ArrayList<CompWindow> windows = new ArrayList<CompWindow>();
 
@@ -32,8 +36,16 @@ public class Driver {
             rotationStart = Double.valueOf(line);
             line = br.readLine();
             rotationEnd = Double.valueOf(line);
-            line= br.readLine();
+            line = br.readLine();
             rotationPrecision = Double.valueOf(line);
+            line = br.readLine();
+            xStart = Integer.valueOf(line);
+            line = br.readLine();
+            xEnd = Integer.valueOf(line);
+            line = br.readLine();
+            yStart = Integer.valueOf(line);
+            line = br.readLine();
+            yEnd = Integer.valueOf(line);
 
             while ((line = br.readLine()) != null) {
                 String[] windowArgs = line.split(" ");
@@ -46,7 +58,8 @@ public class Driver {
         BufferedImage phonopostImg1 = ImageIO.read(new File(phonopostFile1));
         BufferedImage phonopostImg2 = ImageIO.read(new File(phonopostFile2));
 
-        ScanComparator sc = new ScanComparator(phonopostImg1, phonopostImg2, rotationStart, rotationEnd, rotationPrecision, windows);
+        ScanComparator sc = new ScanComparator(phonopostImg1, phonopostImg2, rotationStart, rotationEnd,
+                rotationPrecision, xStart, xEnd, yStart, yEnd, windows);
 
         final long startTime = System.currentTimeMillis();
         double[] minCoordinates = sc.calculateMinDistance();
@@ -73,12 +86,38 @@ public class Driver {
         // write difference data
     }
 
+    public static void writeDiffImage(String experimentFileName, String phonopostFile1, String phonopostFile2, double theta, double xOffset, double yOffset) {
+        BufferedImage phonopostImg1 = null;
+        try {
+            phonopostImg1 = ImageIO.read(new File(phonopostFile1));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        BufferedImage phonopostImg2 = null;
+        try {
+            phonopostImg2 = ImageIO.read(new File(phonopostFile2));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        BufferedImage diffImage = ImageUtils.getDifferenceImage(phonopostImg1, phonopostImg2, theta, xOffset, yOffset);
+
+        try {
+            File diffOutput = new File("results/" + experimentFileName + "/diff.png");
+            ImageIO.write(diffImage, "png", diffOutput);
+        } catch (IOException e) {
+            System.out.println("File write error");
+        }
+    }
+
     public static void main(String[] args) throws IOException {
         String[] experiments = new String[]{"experiment1", "experiment2", "experiment3"};
 
-        for (String experiment : experiments) {
-            runExperiment(experiment);
-        }
+//        for (String experiment : experiments) {
+//            runExperiment(experiment);
+//        }
+
+        writeDiffImage("experiment1", "scan1/color0.png", "scan1/color1.png", 0.05, -21, -50);
     }
 }
 

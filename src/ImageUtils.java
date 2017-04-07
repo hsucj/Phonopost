@@ -19,13 +19,18 @@ public class ImageUtils {
 
         BufferedImage outImg = new BufferedImage(width1, height1, BufferedImage.TYPE_INT_RGB);
 
-        // Modified - Changed to int as pixels are ints
         int diff;
         int result; // Stores output pixel
         for (int i = 0; i < height1; i++) {
             for (int j = 0; j < width1; j++) {
                 int rgb1 = img1.getRGB(j, i);
-                int rgb2 = img2.getRGB(j, i);
+                int rgb2;
+                if (j + xOffset >= 0 && j + xOffset < width2 && i + yOffset >= 0 && i + yOffset < height2) {
+                    rgb2 = rotatedImg2.getRGB(j + (int) xOffset, i + (int) yOffset);
+                } else {
+                    rgb2 = 0;
+                }
+
                 int r1 = (rgb1 >> 16) & 0xff;
                 int g1 = (rgb1 >> 8) & 0xff;
                 int b1 = (rgb1) & 0xff;
