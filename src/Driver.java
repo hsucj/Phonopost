@@ -58,7 +58,7 @@ public class Driver {
         BufferedImage phonopostImg1 = ImageIO.read(new File(phonopostFile1));
         BufferedImage phonopostImg2 = ImageIO.read(new File(phonopostFile2));
 
-        ScanComparator sc = new ScanComparator(phonopostImg1, phonopostImg2, rotationStart, rotationEnd,
+        ScanComparator sc = new ScanComparator(experimentFileName, phonopostImg1, phonopostImg2, rotationStart, rotationEnd,
                 rotationPrecision, xStart, xEnd, yStart, yEnd, windows);
 
         final long startTime = System.currentTimeMillis();
@@ -86,7 +86,8 @@ public class Driver {
         // write difference data
     }
 
-    public static void writeDiffImage(String experimentFileName, String phonopostFile1, String phonopostFile2, double theta, double xOffset, double yOffset) {
+    public static void writeDiffImage(String experimentFileName, String phonopostFile1, String phonopostFile2,
+                                      double theta, double xOffset, double yOffset) {
         BufferedImage phonopostImg1 = null;
         try {
             phonopostImg1 = ImageIO.read(new File(phonopostFile1));
@@ -117,7 +118,7 @@ public class Driver {
 //            runExperiment(experiment);
 //        }
 
-        writeDiffImage("experiment1", "scan1/color0.png", "scan1/color1.png", 0.05, -21, -50);
+        writeDiffImage("experiment1", "scan1/color0.png", "scan1/color1.png", 0.05, 57, 94);
     }
 }
 

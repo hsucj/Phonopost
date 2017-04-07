@@ -25,8 +25,8 @@ public class ImageUtils {
             for (int j = 0; j < width1; j++) {
                 int rgb1 = img1.getRGB(j, i);
                 int rgb2;
-                if (j + xOffset >= 0 && j + xOffset < width2 && i + yOffset >= 0 && i + yOffset < height2) {
-                    rgb2 = rotatedImg2.getRGB(j + (int) xOffset, i + (int) yOffset);
+                if (j - xOffset >= 0 && j - xOffset < width2 && i - yOffset >= 0 && i - yOffset < height2) {
+                    rgb2 = rotatedImg2.getRGB(j - (int) xOffset, i - (int) yOffset);
                 } else {
                     rgb2 = 0;
                 }

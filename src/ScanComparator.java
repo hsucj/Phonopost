@@ -9,6 +9,7 @@ import java.util.ArrayList;
  */
 
 public class ScanComparator {
+    private String experimentFileName;
     private BufferedImage phonopostImg1;
     private BufferedImage phonopostImg2;
     private int centerX1;
@@ -27,8 +28,10 @@ public class ScanComparator {
     private ArrayList<CompWindow> windows;
     private final double scale = 255 * 255;
 
-    public ScanComparator (BufferedImage img1, BufferedImage img2, double rotationStart, double rotationEnd,
-                           double rotationPrecision, int xStart, int xEnd, int yStart, int yEnd, ArrayList<CompWindow> windows) {
+    public ScanComparator (String experimentFileName, BufferedImage img1, BufferedImage img2, double rotationStart,
+                           double rotationEnd, double rotationPrecision, int xStart, int xEnd, int yStart,
+                           int yEnd, ArrayList<CompWindow> windows) {
+        this.experimentFileName = experimentFileName;
         this.phonopostImg1 = img1;
         this.phonopostImg2 = img2;
         this.centerX1 = img1.getWidth()/2;
@@ -63,7 +66,7 @@ public class ScanComparator {
             int centerY2 = rotatedPhonopostImg2.getHeight()/2;
 
 
-            //System.out.println("theta: " + theta);
+            System.out.println(experimentFileName + " theta: " + theta);
 
 
 
@@ -80,7 +83,8 @@ public class ScanComparator {
 
                         for (int x = currWindow.getX(); x < currWindow.getX() + currWindow.getWidth(); x++) {
                             for (int y = currWindow.getY(); y < currWindow.getY() + currWindow.getHeight(); y++) {
-                                if ((x + xTranslate) <= 0 || (x + xTranslate) >= phonopostImg2.getWidth() || (y +  yTranslate) <= 0 || (y + yTranslate) >= phonopostImg2.getHeight()) {
+                                if ((x - xTranslate) <= 0 || (x - xTranslate) >= phonopostImg2.getWidth() ||
+                                        (y -  yTranslate) <= 0 || (y - yTranslate) >= phonopostImg2.getHeight()) {
                                     System.out.println("out of comp bounds");
                                 }
 
@@ -90,7 +94,7 @@ public class ScanComparator {
                                 //System.out.println("X offset: " + (x-centerX1));
                                 //System.out.println("Ys: " + y + " " + yFromCenter);
 
-                                int rgb2 = rotatedPhonopostImg2.getRGB(xFromCenter + xTranslate, yFromCenter + yTranslate);
+                                int rgb2 = rotatedPhonopostImg2.getRGB(xFromCenter - xTranslate, yFromCenter - yTranslate);
 
                                 int bDiff = ((rgb1) & 0xFF) - ((rgb2) & 0xFF);
                                 int bDiffSq = bDiff * bDiff;
