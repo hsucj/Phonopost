@@ -58,6 +58,8 @@ public class Driver {
         BufferedImage phonopostImg1 = ImageIO.read(new File(phonopostFile1));
         BufferedImage phonopostImg2 = ImageIO.read(new File(phonopostFile2));
 
+        ImageUtils.outputWindows(experimentFileName, phonopostImg1, windows);
+
         ScanComparator sc = new ScanComparator(experimentFileName, phonopostImg1, phonopostImg2, rotationStart, rotationEnd,
                 rotationPrecision, xStart, xEnd, yStart, yEnd, windows);
 
@@ -114,11 +116,15 @@ public class Driver {
     public static void main(String[] args) throws IOException {
         String[] experiments = new String[]{"experiment1", "experiment2", "experiment3"};
 
+        // runExperiment(experiments[0]);
+
 //        for (String experiment : experiments) {
+//            System.out.println("Running experiment: " + experiment);
 //            runExperiment(experiment);
+//            System.out.println("Experiment complete: " + experiment);
 //        }
 
-        writeDiffImage("experiment1", "scan1/color0.png", "scan1/color1.png", 0.05, 57, 94);
+        writeDiffImage("experiment1", "scan1/color0.png", "scan1/color1.png", 0.047050000000000085, 26, 40);
     }
 }
 

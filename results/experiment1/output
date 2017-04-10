@@ -1,9 +1,9 @@
 Moving scan1/color1.png to align with scan1/color0.png
-X: 50.0
-Y: 100.0
-Theta: 0.047
-Num pixels: 808362.0
-Sum Dist Squared: 2021448887
-Execution time: 14228
+X: 26.0
+Y: 40.0
+Theta: 0.047050000000000085
+Num pixels: 46656.0
+Sum Dist Squared: 7377161
+Execution time: 31307
 
 

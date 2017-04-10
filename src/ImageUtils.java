@@ -1,6 +1,10 @@
+import javax.imageio.ImageIO;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by cjhsu on 4/6/17.
@@ -14,19 +18,32 @@ public class ImageUtils {
 
         int width1 = img1.getWidth();
         int height1 = img1.getHeight();
-        int width2 = img2.getWidth();
-        int height2 = img2.getHeight();
+        int width2 = rotatedImg2.getWidth();
+        int height2 = rotatedImg2.getHeight();
+
+        int centerX1 = width1/2;
+        int centerY1 = height1/2;
+        int centerX2 = width2/2;
+        int centerY2 = height2/2;
 
         BufferedImage outImg = new BufferedImage(width1, height1, BufferedImage.TYPE_INT_RGB);
 
         int diff;
         int result; // Stores output pixel
+
+        // i is y, j is x
         for (int i = 0; i < height1; i++) {
             for (int j = 0; j < width1; j++) {
                 int rgb1 = img1.getRGB(j, i);
                 int rgb2;
-                if (j - xOffset >= 0 && j - xOffset < width2 && i - yOffset >= 0 && i - yOffset < height2) {
-                    rgb2 = rotatedImg2.getRGB(j - (int) xOffset, i - (int) yOffset);
+
+                int xFromCenter = (j - centerX1) + centerX2;
+                int yFromCenter = (i - centerY1) + centerY2;
+                int translatedX = xFromCenter - (int) xOffset;
+                int translatedY = yFromCenter - (int) yOffset;
+
+                if (translatedX >= 0 && translatedX < width2 && translatedY >= 0 && translatedY < height2) {
+                    rgb2 = rotatedImg2.getRGB(translatedX, translatedY);
                 } else {
                     rgb2 = 0;
                 }
@@ -51,5 +68,21 @@ public class ImageUtils {
         // Now return
         return outImg;
 
+    }
+
+    public static void outputWindows(String experimentName, BufferedImage img, ArrayList<CompWindow> windows) {
+        for (int i = 0; i < windows.size(); i++) {
+            try {
+                File output = new File("windows/" + experimentName + "/win" + i + ".png");
+                CompWindow currWindow = windows.get(i);
+                BufferedImage outImage = img.getSubimage(currWindow.getX(), currWindow.getY(),
+                        currWindow.getWidth(), currWindow.getHeight());
+                ImageIO.write(outImage, "png", output);
+            } catch (IOException e) {
+                System.out.println("File write error");
+            }
+        }
+
+        System.out.println("Output windows for " + experimentName + " written.");
     }
 }

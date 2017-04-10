@@ -1,6 +1,9 @@
+import javax.imageio.ImageIO;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
@@ -47,7 +50,6 @@ public class ScanComparator {
     }
 
     public double[] calculateMinDistance() {
-        double minDistanceSquared = Double.MAX_VALUE;
         BigInteger sumMinDistanceSquared = null;
 
         boolean nullSum = true;
@@ -79,20 +81,22 @@ public class ScanComparator {
                     // for each window
                     for (int winNum = 0; winNum < windows.size(); winNum++) {
 
-                        CompWindow currWindow = windows.get(winNum);
 
-                        for (int x = currWindow.getX(); x < currWindow.getX() + currWindow.getWidth(); x++) {
-                            for (int y = currWindow.getY(); y < currWindow.getY() + currWindow.getHeight(); y++) {
-                                if ((x - xTranslate) <= 0 || (x - xTranslate) >= phonopostImg2.getWidth() ||
-                                        (y -  yTranslate) <= 0 || (y - yTranslate) >= phonopostImg2.getHeight()) {
-                                    System.out.println("out of comp bounds");
-                                }
+                        CompWindow currWindow = windows.get(winNum);
+                        for (int y = currWindow.getY(); y < currWindow.getY() + currWindow.getHeight(); y++) {
+                            for (int x = currWindow.getX(); x < currWindow.getX() + currWindow.getWidth(); x++) {
 
                                 int rgb1 = phonopostImg1.getRGB(x, y);
                                 int xFromCenter = (x - centerX1) + centerX2;
                                 int yFromCenter = (y - centerY1) + centerY2;
                                 //System.out.println("X offset: " + (x-centerX1));
                                 //System.out.println("Ys: " + y + " " + yFromCenter);
+
+                                if ((xFromCenter - xTranslate) <= 0 || (xFromCenter - xTranslate) >= phonopostImg2.getWidth() ||
+                                        (yFromCenter - yTranslate) <= 0 || (yFromCenter - yTranslate) >= phonopostImg2.getHeight()) {
+                                    System.out.println("out of comp bounds");
+                                    continue;
+                                }
 
                                 int rgb2 = rotatedPhonopostImg2.getRGB(xFromCenter - xTranslate, yFromCenter - yTranslate);
 
@@ -113,6 +117,7 @@ public class ScanComparator {
                         }
                     }
 
+                    System.out.println("Sum: " + bDiffSqSum.toString());
 
                     if (nullSum) {
                         sumMinDistanceSquared = bDiffSqSum;
@@ -128,6 +133,21 @@ public class ScanComparator {
                         minCoordinates[1] = yTranslate;
                         minCoordinates[2] = theta;
                         minCoordinates[3] = numPixels;
+
+
+
+                        try {
+                            File output = new File("windows/experiment1/2win0.png");
+                            CompWindow currWindow = windows.get(0);
+                            int xFromCenter = (currWindow.getX() - centerX1) + centerX2;
+                            int yFromCenter = (currWindow.getY() - centerY1) + centerY2;
+                            BufferedImage outImage = rotatedPhonopostImg2.getSubimage(xFromCenter - xTranslate, yFromCenter - yTranslate,
+                                    currWindow.getWidth(), currWindow.getHeight());
+                            ImageIO.write(outImage, "png", output);
+                        } catch (IOException e) {
+                            System.out.println("File write error");
+                        }
+
                     }
                 }
             }
