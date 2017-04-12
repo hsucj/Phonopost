@@ -116,7 +116,7 @@ public class Driver {
     public static void main(String[] args) throws IOException {
         String[] experiments = new String[]{"experiment1", "experiment2", "experiment3"};
 
-        // runExperiment(experiments[0]);
+        runExperiment(experiments[0]);
 
 //        for (String experiment : experiments) {
 //            System.out.println("Running experiment: " + experiment);
@@ -124,7 +124,7 @@ public class Driver {
 //            System.out.println("Experiment complete: " + experiment);
 //        }
 
-        writeDiffImage("experiment1", "scan1/color0.png", "scan1/color1.png", 0.047050000000000085, 26, 40);
+        // writeDiffImage("experiment1", "scan1/color0.png", "scan1/color1.png", 0.04, 1, 67);
     }
 }
 

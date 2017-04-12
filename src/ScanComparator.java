@@ -73,7 +73,7 @@ public class ScanComparator {
 
 
             for (int xTranslate = xStart; xTranslate <= xEnd; xTranslate++) {
-                breakloop:
+                continueloop:
                 for (int yTranslate = yStart; yTranslate <= yEnd; yTranslate++) {
                     BigInteger bDiffSqSum = BigInteger.ZERO;
                     int numPixels = 0;
@@ -110,7 +110,7 @@ public class ScanComparator {
                                 if (!nullSum) {
                                     // if the sum already exceeds a found min, forget this iteration
                                     if (bDiffSqSum.compareTo(sumMinDistanceSquared) > 0) {
-                                        break breakloop;
+                                        continue continueloop;
                                     }
                                 }
                             }
