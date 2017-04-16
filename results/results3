@@ -1,0 +1,50 @@
+Experiment 3 Log:
+
+Trial #1
+scan1/color0.png
+scan1/color3.png
+0.094
+0.098
+0.00001
+50
+70
+70
+100
+636 461 216 216
+2898 569 467 291
+196 1589 527 548
+2848 1859 519 402
+
+Moving scan1/color3.png to align with scan1/color0.png
+X: 59.0
+Y: 83.0
+Theta: 0.094
+Num pixels: 679987.0
+Sum Dist Squared: 160844052
+Execution time: 2390914
+
+
+Trial #2
+scan1/color0.png
+scan1/color3.png
+0.091
+0.095
+0.00001
+50
+70
+70
+100
+636 461 216 216
+2898 569 467 291
+196 1589 527 548
+2848 1859 519 402
+
+Moving scan1/color3.png to align with scan1/color0.png
+X: 59.0
+Y: 83.0
+Theta: 0.09351999999999902
+Num pixels: 679987.0
+Sum Dist Squared: 138466136
+Execution time: 3578478
+
+

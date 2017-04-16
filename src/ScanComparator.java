@@ -1,9 +1,6 @@
-import javax.imageio.ImageIO;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
@@ -136,17 +133,17 @@ public class ScanComparator {
 
 
 
-                        try {
-                            File output = new File("windows/experiment1/2win0.png");
-                            CompWindow currWindow = windows.get(0);
-                            int xFromCenter = (currWindow.getX() - centerX1) + centerX2;
-                            int yFromCenter = (currWindow.getY() - centerY1) + centerY2;
-                            BufferedImage outImage = rotatedPhonopostImg2.getSubimage(xFromCenter - xTranslate, yFromCenter - yTranslate,
-                                    currWindow.getWidth(), currWindow.getHeight());
-                            ImageIO.write(outImage, "png", output);
-                        } catch (IOException e) {
-                            System.out.println("File write error");
-                        }
+//                        try {
+//                            File output = new File("windows/experiment1/2win0.png");
+//                            CompWindow currWindow = windows.get(0);
+//                            int xFromCenter = (currWindow.getX() - centerX1) + centerX2;
+//                            int yFromCenter = (currWindow.getY() - centerY1) + centerY2;
+//                            BufferedImage outImage = rotatedPhonopostImg2.getSubimage(xFromCenter - xTranslate, yFromCenter - yTranslate,
+//                                    currWindow.getWidth(), currWindow.getHeight());
+//                            ImageIO.write(outImage, "png", output);
+//                        } catch (IOException e) {
+//                            System.out.println("File write error");
+//                        }
 
                     }
                 }

@@ -37,10 +37,12 @@ public class ImageUtils {
                 int rgb1 = img1.getRGB(j, i);
                 int rgb2;
 
-                int xFromCenter = (j - centerX1) + centerX2;
-                int yFromCenter = (i - centerY1) + centerY2;
-                int translatedX = xFromCenter - (int) xOffset;
-                int translatedY = yFromCenter - (int) yOffset;
+                int xFromCenter = (j - centerX1);
+                int yFromCenter = (i - centerY1);
+                int x2 = xFromCenter + centerX2;
+                int y2 = yFromCenter + centerY2;
+                int translatedX = x2 - (int) xOffset;
+                int translatedY = y2 - (int) yOffset;
 
                 if (translatedX >= 0 && translatedX < width2 && translatedY >= 0 && translatedY < height2) {
                     rgb2 = rotatedImg2.getRGB(translatedX, translatedY);

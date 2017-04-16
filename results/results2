@@ -1,0 +1,34 @@
+Experiment 2 Log:
+
+Trial #1
+scan1/color0.png
+scan1/color2.png
+0.201
+0.206
+0.00001
+115
+130
+180
+210
+636 461 216 216
+2898 569 467 291
+196 1589 527 548
+2848 1859 519 402
+
+Moving scan1/color2.png to align with scan1/color0.png
+X: 122.0
+Y: 187.0
+Theta: 0.2033000000000023
+Num pixels: 679987.0
+Sum Dist Squared: 63716431
+Execution time: 1989105
+
+Moving scan1/color2.png to align with scan1/color0.png
+X: 122.0
+Y: 187.0
+Theta: 0.2033000000000023
+Num pixels: 679987.0
+Sum Dist Squared: 63716431
+Execution time: 1989105
+
+
