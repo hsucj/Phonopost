@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Vector;
 
 /**
  * Created by cjhsu on 4/15/17.
@@ -57,6 +56,126 @@ public class NormalMapper {
 
     }
 
+    public static double[][] transposeMatrix(double [][] m){
+        double[][] temp = new double[m[0].length][m.length];
+        for (int i = 0; i < m.length; i++)
+            for (int j = 0; j < m[0].length; j++)
+                temp[j][i] = m[i][j];
+        return temp;
+    }
+
+    public static double[][] multiplyByMatrix(double[][] m1, double[][] m2) {
+        int m1ColLength = m1[0].length; // m1 columns length
+        int m2RowLength = m2.length;    // m2 rows length
+        if(m1ColLength != m2RowLength) return null; // matrix multiplication is not possible
+        int mRRowLength = m1.length;    // m result rows length
+        int mRColLength = m2[0].length; // m result columns length
+        double[][] mResult = new double[mRRowLength][mRColLength];
+        for(int i = 0; i < mRRowLength; i++) {         // rows from m1
+            for(int j = 0; j < mRColLength; j++) {     // columns from m2
+                for(int k = 0; k < m1ColLength; k++) { // columns from m1
+                    mResult[i][j] += m1[i][k] * m2[k][j];
+                }
+            }
+        }
+        return mResult;
+    }
+
+    public static double[][] invert(double a[][])
+    {
+        int n = a.length;
+        double x[][] = new double[n][n];
+        double b[][] = new double[n][n];
+        int index[] = new int[n];
+        for (int i=0; i<n; ++i)
+            b[i][i] = 1;
+
+        // Transform the matrix into an upper triangle
+        gaussian(a, index);
+
+        // Update the matrix b[i][j] with the ratios stored
+        for (int i=0; i<n-1; ++i)
+            for (int j=i+1; j<n; ++j)
+                for (int k=0; k<n; ++k)
+                    b[index[j]][k]
+                            -= a[index[j]][i]*b[index[i]][k];
+
+        // Perform backward substitutions
+        for (int i=0; i<n; ++i)
+        {
+            x[n-1][i] = b[index[n-1]][i]/a[index[n-1]][n-1];
+            for (int j=n-2; j>=0; --j)
+            {
+                x[j][i] = b[index[j]][i];
+                for (int k=j+1; k<n; ++k)
+                {
+                    x[j][i] -= a[index[j]][k]*x[k][i];
+                }
+                x[j][i] /= a[index[j]][j];
+            }
+        }
+        return x;
+    }
+
+    // Method to carry out the partial-pivoting Gaussian
+    // elimination.  Here index[] stores pivoting order.
+
+    public static void gaussian(double a[][], int index[])
+    {
+        int n = index.length;
+        double c[] = new double[n];
+
+        // Initialize the index
+        for (int i=0; i<n; ++i)
+            index[i] = i;
+
+        // Find the rescaling factors, one from each row
+        for (int i=0; i<n; ++i)
+        {
+            double c1 = 0;
+            for (int j=0; j<n; ++j)
+            {
+                double c0 = Math.abs(a[i][j]);
+                if (c0 > c1) c1 = c0;
+            }
+            c[i] = c1;
+        }
+
+        // Search the pivoting element from each column
+        int k = 0;
+        for (int j=0; j<n-1; ++j)
+        {
+            double pi1 = 0;
+            for (int i=j; i<n; ++i)
+            {
+                double pi0 = Math.abs(a[index[i]][j]);
+                pi0 /= c[index[i]];
+                if (pi0 > pi1)
+                {
+                    pi1 = pi0;
+                    k = i;
+                }
+            }
+
+            // Interchange rows according to the pivoting order
+            int itmp = index[j];
+            index[j] = index[k];
+            index[k] = itmp;
+            for (int i=j+1; i<n; ++i)
+            {
+                double pj = a[index[i]][j]/a[index[j]][j];
+
+                // Record pivoting ratios below the diagonal
+                a[index[i]][j] = pj;
+
+                // Modify other elements accordingly
+                for (int l=j+1; l<n; ++l)
+                    a[index[i]][l] -= pj*a[index[j]][l];
+            }
+        }
+    }
+
+
     public BufferedImage getNormalMapImage() {
         BufferedImage base = this.bottom.getOrigImg();
         int width = base.getWidth();
@@ -68,6 +187,7 @@ public class NormalMapper {
         BufferedImage normalMap = new BufferedImage(width, height, base.getType());
 
         // Creating L matrix
+        // calculate (L^T L)^-1 L^T
 
         double rightRotation = -1.5708 + this.right.getTheta();
 
@@ -87,31 +207,31 @@ public class NormalMapper {
         double l4y = l1y * Math.cos(leftRotation) + l1x * Math.sin(leftRotation);;
         double l4z = l1z;
 
-        Vector<Vector<Double>> L = new Vector<Vector<Double>>();
+        double[][] L = new double[4][3];
 
-        Vector<Double> l1 = new Vector<Double>();
-        l1.add(l1x);
-        l1.add(l1y);
-        l1.add(l1z);
-        Vector<Double> l2 = new Vector<Double>();
-        l2.add(l2x);
-        l2.add(l2y);
-        l2.add(l2z);
-        Vector<Double> l3 = new Vector<Double>();
-        l3.add(l3x);
-        l3.add(l3y);
-        l3.add(l3z);
-        Vector<Double> l4 = new Vector<Double>();
-        l4.add(l4x);
-        l4.add(l4y);
-        l4.add(l4z);
+        L[0][0] = l1x;
+        L[0][1] = l1y;
+        L[0][2] = l1z;
 
-        L.add(l1);
-        L.add(l2);
-        L.add(l3);
-        L.add(l4);
+        L[1][0] = l2x;
+        L[1][1] = l2y;
+        L[1][2] = l2z;
 
-        // calculate (L^T L)^-1 L^T
+        L[2][0] = l3x;
+        L[2][1] = l3y;
+        L[2][2] = l3z;
+
+        L[3][0] = l4x;
+        L[3][1] = l4y;
+        L[3][2] = l4z;
+
+        double[][] L_t = this.transposeMatrix(L);
+
+        double[][] L_t_L = this.multiplyByMatrix(L_t, L);
+
+        double[][] L_t_L_inv = this.invert(L_t_L);
+
+        double[][] multToColor = this.multiplyByMatrix(L_t_L_inv, L_t);
 
         // raise values of blue channel to power of 2.2 for gamma correction
 
@@ -131,6 +251,22 @@ public class NormalMapper {
                     continue;
                 }
 
+                double[][] colorMat = new double[4][1];
+                colorMat[0][0] = bottomRGB;
+                colorMat[1][0] = rightRGB;
+                colorMat[2][0] = topRGB;
+                colorMat[3][0] = leftRGB;
+
+                double[][] normal = this.multiplyByMatrix(multToColor, colorMat);
+
+                double magnitude = Math.sqrt(normal[0][0] * normal[0][0] + normal[1][0] * normal[1][0] + normal[2][0] * normal[2][0]);
+
+                double[] normalizedNorm = new double[3];
+                normalizedNorm[0] = normal[0][0] / magnitude;
+                normalizedNorm[1] = normal[1][0] / magnitude;
+                normalizedNorm[2] = normal[2][0] / magnitude;
+
+
 //                double nx = rightRGB - leftRGB;
                 double ny = topRGB - bottomRGB;
                 double nx = 0.0;
@@ -140,9 +276,9 @@ public class NormalMapper {
 
                 double nz = Math.sqrt(1.0 - nx * nx - ny * ny);
 
-                int r = (int) ((0.5 + 0.5 * nx) * 255);
-                int g = (int) ((0.5 + 0.5 * ny) * 255);
-                int b = (int) ((0.5 + 0.5 * nz) * 255);
+                int r = (int) ((0.5 + 0.5 * normalizedNorm[0]) * 255);
+                int g = (int) ((0.5 + 0.5 * normalizedNorm[1]) * 255);
+                int b = (int) ((0.5 + 0.5 * normalizedNorm[2]) * 255);
                 int color = (r << 16) | (g << 8) | b;
 
 
