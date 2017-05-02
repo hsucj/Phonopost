@@ -32,16 +32,24 @@ public class ScanTransformation {
         BufferedImage rotatedPhonopostImg = rotateOp.filter(origImg, null);
 
         this.rotImg = rotatedPhonopostImg;
-        this.transformedCenterX = rotatedPhonopostImg.getWidth();
-        this.transformedCenterY = rotatedPhonopostImg.getHeight();
+        this.transformedCenterX = rotatedPhonopostImg.getWidth() / 2;
+        this.transformedCenterY = rotatedPhonopostImg.getHeight() / 2;
     }
 
     public BufferedImage getOrigImg() {
         return this.origImg;
     }
 
+    public double getTheta() { return this.theta;}
+
     public int getTransformedRGB (int xFromCenter, int yFromCenter) {
-        return this.rotImg.getRGB(this.transformedCenterX + xFromCenter - this.xOffset,
-                this.transformedCenterY + yFromCenter - this.yOffset);
+        int targetX = this.transformedCenterX + xFromCenter - this.xOffset;
+        int targetY = this.transformedCenterY + yFromCenter - this.yOffset;
+
+        if (targetX < 0 || targetX >= rotImg.getWidth() || targetY < 0 || targetY >= rotImg.getHeight()) {
+            return -1;
+        }
+
+        return this.rotImg.getRGB(targetX, targetY);
     }
 }

@@ -1,5 +1,5 @@
 scan1
 bottom scan1/color0.png 0 0 0
-left scan1/color1.png 0.05615000000000005 23 57
+right scan1/color1.png 0.05615000000000005 23 57
 top scan1/color2.png 0.2033000000000023 122 187
-right scan1/color3.png 0.09351999999999902 59 83
+left scan1/color3.png 0.09351999999999902 59 83
